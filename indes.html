@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CHAIN FITNESS — Member Records</title>
+  <!-- ✅ External CSS file -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">
+	<img src="./logo.jpg" alt="Chain Fitness Logo" style="height:80px;">
+      </div>
+      <div class="company">
+        <h1>CHAIN FITNESS</h1>
+        <p>200-2, Jln Besar KU 13, Pekan Kapar, 42200 Kapar, Selangor · 0192323159</p>
+      </div>
+    </div>
+    <div class="tagline">Member records — stored locally in your browser</div>
+  </header>
+
+  <div class="card">
+    <h2>Add / Edit Member</h2>
+    <form id="memberForm">
+      <input type="hidden" id="memberId" />
+
+      <div class="col">
+        <label for="fullName">Full name</label>
+        <input id="fullName" type="text" required placeholder="e.g. Ahmad bin Ali" />
+      </div>
+
+      <div class="col">
+        <label for="phone">Phone</label>
+        <input id="phone" type="text" placeholder="019xxxxxxx" />
+      </div>
+
+      <div class="col">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="name@example.com" />
+      </div>
+
+      <div class="col">
+        <label for="membership">Membership type</label>
+        <select id="membership">
+          <option value="Male Membership">Male Membership</option>
+          <option value="Female Membership">Female Membership</option>
+          <option value="Student Membership">Student Membership</option>
+        </select>
+      </div>
+
+      <div class="col">
+        <label for="joinDate">Join date</label>
+        <input id="joinDate" type="date" />
+      </div>
+
+      <div class="col full">
+        <label for="address">Address</label>
+        <input id="address" type="text" placeholder="Optional" />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" id="saveBtn">Save member</button>
+        <button type="button" id="resetBtn" class="ghost">Reset</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <input class="search" id="search" placeholder="Search by name, phone, email..." />
+      <select id="filterMembership">
+        <option value="">All memberships</option>
+        <option>Male Membership</option>
+        <option>Female Membership</option>
+        <option>Student Membership</option>
+      </select>
+      <div class="actions">
+        <button id="exportBtn" class="ghost">Export CSV</button>
+        <button id="exportJsonBtn" class="ghost">Export JSON</button>
+        <input id="importFile" type="file" accept="application/json" style="display:none" />
+        <button id="importBtn" class="ghost">Import JSON</button>
+      </div>
+    </div>
+
+    <table id="membersTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Membership</th>
+          <th>Join date</th>
+          <th>Address</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="footer">
+      Tip: This data is stored locally in your browser's storage. To keep a backup, export JSON or CSV.
+    </div>
+  </div>
+
+  <script>
+  const STORAGE_KEY = 'chain_fitness_members_v2';
+
+  function uid() { return 'm_' + Math.random().toString(36).slice(2, 9); }
+  function loadMembers() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  function saveMembers(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+  function clearForm() {
+    document.getElementById('memberId').value = '';
+    document.getElementById('memberForm').reset();
+    document.getElementById('saveBtn').textContent = 'Save member';
+  }
+
+  function escapeHtml(s){ return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+
+  function renderTable() {
+    const tbody = document.querySelector('#membersTable tbody');
+    tbody.innerHTML = '';
+    const q = document.getElementById('search').value.trim().toLowerCase();
+    const filter = document.getElementById('filterMembership').value;
+    let members = loadMembers();
+    if(filter) members = members.filter(m=>m.membership===filter);
+    if(q) members = members.filter(m=> (m.fullName||'').toLowerCase().includes(q));
+    if(members.length===0){ 
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted)">No members yet</td></tr>'; 
+      return; 
+    }
+    members.forEach((m,i)=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(m.fullName)}</td><td>${escapeHtml(m.phone)}</td><td>${escapeHtml(m.email)}</td><td>${escapeHtml(m.membership)}</td><td>${m.joinDate}</td><td>${escapeHtml(m.address)}</td><td><button class='ghost' onclick='editMember("${m.id}")'>Edit</button> <button class='danger' onclick='deleteMember("${m.id}")'>Delete</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('memberForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const id = document.getElementById('memberId').value || uid();
+    const data = {
+      id,
+      fullName: document.getElementById('fullName').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      membership: document.getElementById('membership').value,
+      joinDate: document.getElementById('joinDate').value,
+      address: document.getElementById('address').value.trim()
+    };
+    const members = loadMembers();
+    const idx = members.findIndex(m=>m.id===id);
+    if(idx>=0) members[idx]=data; else members.push(data);
+    saveMembers(members);
+    clearForm(); renderTable();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', clearForm);
+
+  window.editMember = id => {
+    const m = loadMembers().find(x=>x.id===id);
+    if(!m) return;
+    for(const [k,v] of Object.entries(m)) 
+      if(document.getElementById(k)) document.getElementById(k).value = v;
+    document.getElementById('saveBtn').textContent = 'Update member';
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+
+  window.deleteMember = id => {
+    if(!confirm('Delete this member?')) return;
+    saveMembers(loadMembers().filter(m=>m.id!==id)); 
+    renderTable();
+  };
+
+  document.getElementById('search').addEventListener('input', renderTable);
+  document.getElementById('filterMembership').addEventListener('change', renderTable);
+
+  // ✅ Export CSV (works even in file:/// mode)
+  document.getElementById('exportBtn').addEventListener('click', ()=>{
+    const members = loadMembers();
+    if(members.length===0) return alert('No members to export.');
+    const header = ['Name','Phone','Email','Membership','Join Date','Address'];
+    const rows = members.map(m => [m.fullName, m.phone, m.email, m.membership, m.joinDate, m.address]);
+    const csv = [header, ...rows].map(r=>r.map(x=>`"${(x||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], {type: 'text/csv'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'members.csv';
+    link.click();
+  });
+
+  // ✅ Export JSON (works even in file:/// mode)
+  document.getElementById('exportJsonBtn').addEventListener('click', ()=>{
+    const members = loadMembers();
+    if(members.length===0) return alert('No members to export.');
+    const blob = new Blob([JSON.stringify(members,null,2)], {type: 'application/json'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'members.json';
+    link.click();
+  });
+
+  // ✅ Import JSON (works in file:///)
+  document.getElementById('importBtn').addEventListener('click', ()=>{
+    document.getElementById('importFile').click();
+  });
+
+  document.getElementById('importFile').addEventListener('change', e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      try {
+        const data = JSON.parse(ev.target.result);
+        if(!Array.isArray(data)) throw new Error('Invalid file');
+        saveMembers(data);
+        renderTable();
+        alert('Import successful!');
+      } catch {
+        alert('Import failed — invalid JSON file.');
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  renderTable();
+</script>
+</body>
+</html>
