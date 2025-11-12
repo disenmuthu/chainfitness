@@ -1,4 +1,4 @@
-/* ===== CHAIN FITNESS Dark Edition v2.0 ===== */
+/* ===== CHAIN FITNESS Dark Edition v2.1 (Mobile Optimized) ===== */
 :root {
   --bg: #0e0f13;
   --card: #1b1e24;
@@ -16,7 +16,7 @@ body {
   background: var(--bg);
   color: var(--text);
   margin: 0;
-  padding: 28px;
+  padding: 20px;
   line-height: 1.6;
 }
 
@@ -224,12 +224,31 @@ tr:hover {
 /* ===== Responsiveness ===== */
 @media (max-width: 600px) {
   body {
-    padding: 16px;
+    padding: 10px;
   }
 
   header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .brand {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .logo img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .company p {
+    font-size: 11px;
+  }
+
+  .card {
+    padding: 12px;
+    margin: 10px 0;
   }
 
   .toolbar {
@@ -240,4 +259,14 @@ tr:hover {
   button, .search, select {
     width: 100%;
   }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    font-size: 13px;
+  }
+
+  th, td {
+    white-space: nowrap;
+  }
 }
