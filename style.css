@@ -1,4 +1,4 @@
-/* ===== CHAIN FITNESS Dark Edition v2.1 (Mobile Optimized) ===== */
+/* ===== CHAIN FITNESS Dark Edition v2.0 ===== */
 :root {
   --bg: #0e0f13;
   --card: #1b1e24;
@@ -16,7 +16,7 @@ body {
   background: var(--bg);
   color: var(--text);
   margin: 0;
-  padding: 20px;
+  padding: 28px;
   line-height: 1.6;
 }
 
@@ -224,31 +224,12 @@ tr:hover {
 /* ===== Responsiveness ===== */
 @media (max-width: 600px) {
   body {
-    padding: 10px;
+    padding: 16px;
   }
 
   header {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .brand {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .logo img {
-    width: 60px;
-    height: 60px;
-  }
-
-  .company p {
-    font-size: 11px;
-  }
-
-  .card {
-    padding: 12px;
-    margin: 10px 0;
   }
 
   .toolbar {
@@ -259,14 +240,146 @@ tr:hover {
   button, .search, select {
     width: 100%;
   }
-
-  table {
-    display: block;
-    overflow-x: auto;
-    font-size: 13px;
-  }
-
-  th, td {
-    white-space: nowrap;
-  }
 }
+
+/* ===== LOGIN OVERLAY ===== */
+#loginOverlay {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  font-family: var(--font);
+}
+
+#loginOverlay img {
+  width: 120px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  margin-bottom: 20px;
+}
+
+#loginOverlay h2 {
+  color: var(--accent);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+#loginOverlay input {
+  font-size: 18px;
+  padding: 12px;
+  margin: 8px 0;
+  width: 250px;
+  border-radius: 10px;
+  border: 1px solid #2d323b;
+  background: #2a2e35;
+  color: var(--text);
+  outline: none;
+  transition: 0.2s;
+}
+
+#loginOverlay input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 5px rgba(212, 175, 55, 0.4);
+}
+
+#loginOverlay button {
+  font-size: 18px;
+  padding: 12px 20px;
+  margin-top: 12px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+#loginOverlay button:hover {
+  background: var(--accent-hover);
+}
+
+/* ===== LOGIN OVERLAY ===== */
+#loginOverlay {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  font-family: var(--font);
+}
+
+#loginOverlay img {
+  width: 120px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  margin-bottom: 20px;
+}
+
+#loginOverlay h2 {
+  color: var(--accent);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+#loginOverlay input {
+  font-size: 18px;
+  padding: 12px;
+  margin: 8px 0;
+  width: 250px;
+  border-radius: 10px;
+  border: 1px solid #2d323b;
+  background: #2a2e35;
+  color: var(--text);
+  outline: none;
+  transition: 0.2s;
+}
+
+#loginOverlay input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 5px rgba(212, 175, 55, 0.4);
+}
+
+#loginOverlay button {
+  font-size: 18px;
+  padding: 12px 20px;
+  margin-top: 12px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+#loginOverlay button:hover {
+  background: var(--accent-hover);
+}
+
+/* ===== WhatsApp Button ===== */
+button.whatsapp {
+  background-color: #25D366;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 4px;
+  transition: 0.2s;
+}
+button.whatsapp:hover {
+  background-color: #1ebe57;
+}
+
+
