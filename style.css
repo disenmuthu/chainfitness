@@ -18,6 +18,7 @@ body {
   margin: 0;
   padding: 28px;
   line-height: 1.6;
+  overflow-x: hidden; /* prevent horizontal scroll on mobile */
 }
 
 h1, h2, h3 {
@@ -80,6 +81,8 @@ header {
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.35);
   margin-bottom: 16px;
   border: 1px solid #2a2d33;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* ===== Form Styling ===== */
@@ -136,6 +139,7 @@ button {
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s, transform 0.2s;
+  box-sizing: border-box;
 }
 
 button:hover {
@@ -185,6 +189,7 @@ button.danger:hover {
 .actions {
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 /* ===== Table ===== */
@@ -192,6 +197,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 12px;
+  table-layout: fixed;
 }
 
 th, td {
@@ -199,6 +205,7 @@ th, td {
   text-align: left;
   border-bottom: 1px solid #2d323b;
   font-size: 14px;
+  word-wrap: break-word;
 }
 
 th {
@@ -221,8 +228,46 @@ tr:hover {
   text-align: center;
 }
 
+/* ===== WhatsApp Button ===== */
+.whatsapp-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #25d366;
+  color: #fff;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 999;
+  transition: transform 0.2s;
+}
+
+.whatsapp-button:hover {
+  transform: scale(1.1);
+}
+
 /* ===== Responsiveness ===== */
-@media (max-width: 600px) {
+@media (max-width: 1024px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search, button, select {
+    width: 100%;
+  }
+
+  .col {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 768px) {
   body {
     padding: 16px;
   }
@@ -232,12 +277,47 @@ tr:hover {
     align-items: flex-start;
   }
 
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
+  .logo img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .company h1 {
+    font-size: 18px;
   }
 
   button, .search, select {
     width: 100%;
+  }
+
+  .whatsapp-button {
+    bottom: 16px;
+    right: 16px;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
+
+  .logo img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .company h1 {
+    font-size: 16px;
+  }
+
+  button {
+    padding: 8px 12px;
+  }
+
+  table th, table td {
+    font-size: 12px;
+    padding: 6px 4px;
   }
 }
