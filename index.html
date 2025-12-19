@@ -159,20 +159,23 @@ function renderTable() {
       else expiryHTML=`<span style="color:green;font-weight:bold">${m.expiryDate}</span>`;
     }
     const tr = document.createElement('tr');
-    tr.innerHTML=`
-      <td>${i+1}</td>
-      <td>${escapeHtml(m.fullName)}</td>
-      <td>${escapeHtml(m.phone)}</td>
-      <td>${escapeHtml(m.email)}</td>
-      <td>${escapeHtml(m.membership)}</td>
-      <td>${m.joinDate}</td>
-      <td>${expiryHTML}</td>
-      <td>${escapeHtml(m.address)}</td>
-      <td>
-        <button class='ghost' onclick='editMember("${m.id}")'>Edit</button>
-        <button class='danger' onclick='deleteMember("${m.id}")'>Delete</button>
-        <button class='whatsapp' onclick='sendWhatsApp("${m.id}")'>WhatsApp</button>
-      </td>`;
+    const tr = document.createElement('tr');
+  tr.innerHTML = `
+  <td data-label="#">${i+1}</td>
+  <td data-label="Name">${escapeHtml(m.fullName)}</td>
+  <td data-label="Phone">${escapeHtml(m.phone)}</td>
+  <td data-label="Email">${escapeHtml(m.email)}</td>
+  <td data-label="Membership">${escapeHtml(m.membership)}</td>
+  <td data-label="Join date">${m.joinDate}</td>
+  <td data-label="Expiry">${expiryHTML}</td>
+  <td data-label="Address">${escapeHtml(m.address)}</td>
+  <td data-label="Actions">
+    <button class='ghost' onclick='editMember("${m.id}")'>Edit</button>
+    <button class='danger' onclick='deleteMember("${m.id}")'>Delete</button>
+    <button class='whatsapp' onclick='sendWhatsApp("${m.id}")'>WhatsApp</button>
+  </td>
+`;
+
     tbody.appendChild(tr);
   });
 }
