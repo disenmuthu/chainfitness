@@ -6,12 +6,27 @@
   <title>CHAIN FITNESS — Member Records</title>
   <!-- ✅ External CSS file -->
   <link rel="stylesheet" href="style.css">
+  <style>
+    button.whatsapp {
+      background-color: #25D366;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 3px;
+      font-weight: bold;
+    }
+    button.whatsapp:hover {
+      background-color: #1ebe57;
+    }
+  </style>
 </head>
 <body>
   <header>
     <div class="brand">
       <div class="logo">
-	<img src="./logo.jpg" alt="Chain Fitness Logo" style="height:80px;">
+	    <img src="./logo.jpg" alt="Chain Fitness Logo" style="height:80px;">
       </div>
       <div class="company">
         <h1>CHAIN FITNESS</h1>
@@ -55,6 +70,11 @@
         <input id="joinDate" type="date" />
       </div>
 
+      <div class="col">
+        <label for="expiryDate">Membership End Date</label>
+        <input id="expiryDate" type="date" />
+      </div>
+
       <div class="col full">
         <label for="address">Address</label>
         <input id="address" type="text" placeholder="Optional" />
@@ -93,6 +113,7 @@
           <th>Email</th>
           <th>Membership</th>
           <th>Join date</th>
+          <th>Expiry</th>
           <th>Address</th>
           <th>Actions</th>
         </tr>
@@ -106,154 +127,190 @@
   </div>
 
   <script>
-  const STORAGE_KEY = 'chain_fitness_members_v2';
+const STORAGE_KEY = 'chain_fitness_members_v2';
 
-  function uid() { return 'm_' + Math.random().toString(36).slice(2, 9); }
-  function loadMembers() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-  function saveMembers(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+function uid() { return 'm_' + Math.random().toString(36).slice(2, 9); }
+function loadMembers() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+function saveMembers(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
 
-  function clearForm() {
-    document.getElementById('memberId').value = '';
-    document.getElementById('memberForm').reset();
-    document.getElementById('saveBtn').textContent = 'Save member';
+function clearForm() {
+  document.getElementById('memberId').value = '';
+  document.getElementById('memberForm').reset();
+  document.getElementById('saveBtn').textContent = 'Save member';
+}
+
+function escapeHtml(s){ 
+  return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); 
+}
+
+function renderTable() {
+  const tbody = document.querySelector('#membersTable tbody');
+  tbody.innerHTML = '';
+
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const filter = document.getElementById('filterMembership').value;
+  let members = loadMembers();
+
+  if(filter) members = members.filter(m => m.membership === filter);
+  if(q) members = members.filter(m => (m.fullName||'').toLowerCase().includes(q));
+
+  if(members.length === 0){ 
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted)">No members yet</td></tr>'; 
+    return; 
   }
 
-  function escapeHtml(s){ return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+  const today = new Date().toISOString().slice(0,10);
 
-  function renderTable() {
-    const tbody = document.querySelector('#membersTable tbody');
-    tbody.innerHTML = '';
-    const q = document.getElementById('search').value.trim().toLowerCase();
-    const filter = document.getElementById('filterMembership').value;
-    let members = loadMembers();
-    if(filter) members = members.filter(m=>m.membership===filter);
-    if(q) members = members.filter(m=> (m.fullName||'').toLowerCase().includes(q));
-    if(members.length===0){ 
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted)">No members yet</td></tr>'; 
-      return; 
-    }
-    members.forEach((m,i)=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(m.fullName)}</td><td>${escapeHtml(m.phone)}</td><td>${escapeHtml(m.email)}</td><td>${escapeHtml(m.membership)}</td><td>${m.joinDate}</td><td>${escapeHtml(m.address)}</td><td><button class='ghost' onclick='editMember("${m.id}")'>Edit</button> <button class='danger' onclick='deleteMember("${m.id}")'>Delete</button></td>`;
-      tbody.appendChild(tr);
-    });
-  }
-
-  document.getElementById('memberForm').addEventListener('submit', e=>{
-    e.preventDefault();
-    const id = document.getElementById('memberId').value || uid();
-    const data = {
-      id,
-      fullName: document.getElementById('fullName').value.trim(),
-      phone: document.getElementById('phone').value.trim(),
-      email: document.getElementById('email').value.trim(),
-      membership: document.getElementById('membership').value,
-      joinDate: document.getElementById('joinDate').value,
-      address: document.getElementById('address').value.trim()
-    };
-    const members = loadMembers();
-    const idx = members.findIndex(m=>m.id===id);
-    if(idx>=0) members[idx]=data; else members.push(data);
-    saveMembers(members);
-    clearForm(); renderTable();
-  });
-
-  document.getElementById('resetBtn').addEventListener('click', clearForm);
-
-  window.editMember = id => {
-    const m = loadMembers().find(x=>x.id===id);
-    if(!m) return;
-    for(const [k,v] of Object.entries(m)) 
-      if(document.getElementById(k)) document.getElementById(k).value = v;
-    document.getElementById('saveBtn').textContent = 'Update member';
-    window.scrollTo({top:0,behavior:'smooth'});
-  };
-
-  window.deleteMember = id => {
-    if(!confirm('Delete this member?')) return;
-    saveMembers(loadMembers().filter(m=>m.id!==id)); 
-    renderTable();
-  };
-
-  document.getElementById('search').addEventListener('input', renderTable);
-  document.getElementById('filterMembership').addEventListener('change', renderTable);
-
-  // ✅ Export CSV (works even in file:/// mode)
-  document.getElementById('exportBtn').addEventListener('click', ()=>{
-    const members = loadMembers();
-    if(members.length===0) return alert('No members to export.');
-    const header = ['Name','Phone','Email','Membership','Join Date','Address'];
-    const rows = members.map(m => [m.fullName, m.phone, m.email, m.membership, m.joinDate, m.address]);
-    const csv = [header, ...rows].map(r=>r.map(x=>`"${(x||'').replace(/"/g,'""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], {type: 'text/csv'});
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'members.csv';
-    link.click();
-  });
-
-  // ✅ Export JSON (works even in file:/// mode)
-  document.getElementById('exportJsonBtn').addEventListener('click', ()=>{
-    const members = loadMembers();
-    if(members.length===0) return alert('No members to export.');
-    const blob = new Blob([JSON.stringify(members,null,2)], {type: 'application/json'});
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'members.json';
-    link.click();
-  });
-
-  // ✅ Import JSON (works in file:///)
-  document.getElementById('importBtn').addEventListener('click', ()=>{
-    document.getElementById('importFile').click();
-  });
-
-  document.getElementById('importFile').addEventListener('change', e=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = ev=>{
-      try {
-        const data = JSON.parse(ev.target.result);
-        if(!Array.isArray(data)) throw new Error('Invalid file');
-        saveMembers(data);
-        renderTable();
-        alert('Import successful!');
-      } catch {
-        alert('Import failed — invalid JSON file.');
+  members.forEach((m,i) => {
+    let expiryHTML = '';
+    
+    if (!m.expiryDate) {
+      expiryHTML = `<span style="color:gray">No date</span>`;
+    } else if (m.expiryDate < today) {
+      expiryHTML = `<span style="color:red;font-weight:bold">${m.expiryDate}</span>`;
+    } else {
+      const diff = Math.ceil((new Date(m.expiryDate) - new Date(today)) / (1000*60*60*24));
+      if (diff <= 7) {
+        expiryHTML = `<span style="color:orange;font-weight:bold">${m.expiryDate} (${diff} days left)</span>`;
+      } else {
+        expiryHTML = `<span style="color:green;font-weight:bold">${m.expiryDate}</span>`;
       }
-    };
-    reader.readAsText(file);
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${escapeHtml(m.fullName)}</td>
+      <td>${escapeHtml(m.phone)}</td>
+      <td>${escapeHtml(m.email)}</td>
+      <td>${escapeHtml(m.membership)}</td>
+      <td>${m.joinDate}</td>
+      <td>${expiryHTML}</td>
+      <td>${escapeHtml(m.address)}</td>
+      <td>
+        <button class='ghost' onclick='editMember("${m.id}")'>Edit</button>
+        <button class='danger' onclick='deleteMember("${m.id}")'>Delete</button>
+        <button class='whatsapp' onclick='sendWhatsApp("${m.id}")'>WhatsApp</button>
+      </td>`;
+    tbody.appendChild(tr);
   });
+}
 
-  renderTable();
-</script>
-	  renderTable();
-</script>
-
-<!-- === Firebase Connection === -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, push, onValue, set, remove } 
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    databaseURL: "YOUR_DATABASE_URL",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MSG_ID",
-    appId: "YOUR_APP_ID"
+document.getElementById('memberForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const id = document.getElementById('memberId').value || uid();
+  const data = {
+    id,
+    fullName: document.getElementById('fullName').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    membership: document.getElementById('membership').value,
+    joinDate: document.getElementById('joinDate').value,
+    expiryDate: document.getElementById('expiryDate').value,
+    address: document.getElementById('address').value.trim(),
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+  const members = loadMembers();
+  const idx = members.findIndex(m => m.id === id);
+  if(idx >= 0) members[idx] = data; else members.push(data);
 
-  const testRef = ref(db, 'test');
-  set(testRef, { message: "Firebase connected successfully!" });
+  saveMembers(members);
+  clearForm(); 
+  renderTable();
+});
+
+document.getElementById('resetBtn').addEventListener('click', clearForm);
+
+window.editMember = id => {
+  const m = loadMembers().find(x => x.id === id);
+  if(!m) return;
+  for(const [k,v] of Object.entries(m)) {
+    if(document.getElementById(k)) document.getElementById(k).value = v;
+  }
+  document.getElementById('saveBtn').textContent = 'Update member';
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+
+window.deleteMember = id => {
+  if(!confirm('Delete this member?')) return;
+  saveMembers(loadMembers().filter(m => m.id !== id)); 
+  renderTable();
+};
+
+document.getElementById('search').addEventListener('input', renderTable);
+document.getElementById('filterMembership').addEventListener('change', renderTable);
+
+// Export CSV
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const members = loadMembers();
+  if(members.length===0) return alert('No members to export.');
+
+  const header = ['Name','Phone','Email','Membership','Join Date','Expiry Date','Address'];
+  const rows = members.map(m => [
+    m.fullName, m.phone, m.email, m.membership, m.joinDate, m.expiryDate, m.address
+  ]);
+
+  const csv = [header, ...rows]
+    .map(r => r.map(x => `"${(x||'').replace(/"/g,'""')}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'members.csv';
+  link.click();
+});
+
+// Export JSON
+document.getElementById('exportJsonBtn').addEventListener('click', ()=>{
+  const members = loadMembers();
+  if(members.length===0) return alert('No members to export.');
+
+  const blob = new Blob([JSON.stringify(members,null,2)], {type: 'application/json'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'members.json';
+  link.click();
+});
+
+// Import JSON
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  document.getElementById('importFile').click();
+});
+
+document.getElementById('importFile').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    try {
+      const data = JSON.parse(ev.target.result);
+      if(!Array.isArray(data)) throw new Error('Invalid file');
+      saveMembers(data);
+      renderTable();
+      alert('Import successful!');
+    } catch {
+      alert('Import failed — invalid JSON file.');
+    }
+  };
+  reader.readAsText(file);
+});
+
+// WhatsApp Reminder Function
+window.sendWhatsApp = id => {
+  const m = loadMembers().find(x => x.id === id);
+  if(!m || !m.phone) return alert('No phone number available for this member.');
+
+  const message = `Hi ${m.fullName},\n\nYour gym membership (${
+    m.membership
+  }) is ${m.expiryDate ? `expiring on ${m.expiryDate}` : 'not set'}.\nPlease renew it soon.\n\n- Chain Fitness`;
+
+  const phone = m.phone.replace(/\D/g,''); // only digits
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+};
+
+renderTable();
 </script>
-<!-- === End Firebase Connection === -->
-
 </body>
 </html>
