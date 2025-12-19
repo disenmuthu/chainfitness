@@ -195,6 +195,18 @@ function renderTable() {
     tbody.appendChild(tr);
   });
 }
+ <tr>
+  <td data-label="Name">John Doe</td>
+  <td data-label="Email">john@example.com</td>
+  <td data-label="Join Date">2025-11-18</td>
+  <td data-label="Expiry">2025-12-19</td>
+  <td data-label="Address">12 Jalan Kapa</td>
+  <td class="actions">
+    <button>Edit</button>
+    <button>Delete</button>
+    <button>WhatsApp</button>
+  </td>
+</tr>
 
 document.getElementById('memberForm').addEventListener('submit', e => {
   e.preventDefault();
