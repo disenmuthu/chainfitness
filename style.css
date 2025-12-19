@@ -321,3 +321,25 @@ tr:hover {
     padding: 6px 4px;
   }
 }
+
+/* Make tables scrollable on small screens */
+table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap; /* prevent breaking table cells */
+}
+
+/* Optional: make buttons inside table smaller on mobile */
+@media (max-width: 480px) {
+  table th, table td {
+    font-size: 12px;
+    padding: 6px 4px;
+  }
+
+  .actions button {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+}
+
