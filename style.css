@@ -382,4 +382,48 @@ button.whatsapp:hover {
   background-color: #1ebe57;
 }
 
+/* Mobile-friendly member cards */
+@media (max-width: 600px) {
+  #membersTable,
+  #membersTable thead,
+  #membersTable tbody,
+  #membersTable tr,
+  #membersTable th,
+  #membersTable td {
+    display: block;
+    width: 100%;
+  }
+
+  #membersTable thead tr {
+    display: none; /* hide table headers */
+  }
+
+  #membersTable tbody tr {
+    background: var(--card);
+    margin-bottom: 12px;
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  }
+
+  #membersTable tbody td {
+    padding: 6px 0;
+    text-align: right;
+    position: relative;
+  }
+
+  #membersTable tbody td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    color: var(--accent);
+  }
+
+  #membersTable tbody td button.whatsapp {
+    width: 100%;
+    margin-top: 4px;
+  }
+}
+
+
 
