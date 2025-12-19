@@ -193,9 +193,7 @@ function renderTable() {
         <button class='whatsapp' onclick='sendWhatsApp("${m.id}")'>WhatsApp</button>
       </td>`;
     tbody.appendChild(tr);
-  });
-}
- <tr>
+   <tr>
   <td data-label="Name">John Doe</td>
   <td data-label="Email">john@example.com</td>
   <td data-label="Join Date">2025-11-18</td>
@@ -207,6 +205,8 @@ function renderTable() {
     <button>WhatsApp</button>
   </td>
 </tr>
+  });
+}
 
 document.getElementById('memberForm').addEventListener('submit', e => {
   e.preventDefault();
