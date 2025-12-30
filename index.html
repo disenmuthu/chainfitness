@@ -1,13 +1,15 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CHAIN FITNESS — Member Records</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CHAIN FITNESS</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
+<div class="app">
 
 <!-- TOP BAR -->
 <div class="topbar">
@@ -15,134 +17,105 @@
   <button id="logoutBtn" style="display:none;">Logout</button>
 </div>
 
-<!-- LOGIN MODAL -->
+<!-- LOGIN -->
 <div id="loginModal" class="login-overlay">
   <div class="login-box">
     <img src="./logo.jpg" class="login-logo">
     <h2>Admin Login</h2>
-    <input id="authPass" type="password" placeholder="Enter password">
+    <input id="authPass" type="password" placeholder="Password">
     <button id="authSubmit">Login</button>
     <p id="authError">Wrong password</p>
   </div>
 </div>
 
 <header>
-  <div class="brand">
-    <img src="./logo.jpg" class="main-logo">
-    <div>
-      <h1>CHAIN FITNESS</h1>
-      <p>200-2 Jln Besar KU 13, Kapar · 0192323159</p>
-    </div>
-  </div>
-  <div class="tagline">Member records stored locally</div>
+  <img src="./logo.jpg" class="hero-logo">
+  <h1>CHAIN FITNESS</h1>
+  <p class="subtitle">Member Management System</p>
 </header>
 
-<!-- PROTECTED -->
-<div id="protectedArea" style="display:none;">
+<div id="protectedArea" style="display:none">
 
-  <!-- FORM -->
-  <div class="card">
-    <h2>Add / Edit Member</h2>
+<!-- FORM -->
+<div class="card">
+<h2>Add / Edit Member</h2>
 
-    <form id="memberForm">
-      <input type="hidden" id="memberId">
+<form id="memberForm">
+<input type="hidden" id="memberId">
 
-      <div class="col"><label>Name</label><input id="fullName" required></div>
-      <div class="col"><label>Phone</label><input id="phone"></div>
-      <div class="col"><label>Email</label><input id="email"></div>
+<input id="fullName" placeholder="Full Name" required>
+<input id="phone" placeholder="Phone">
+<input id="email" placeholder="Email">
 
-      <div class="col">
-        <label>Membership</label>
-        <select id="membership">
-          <option>Male Membership</option>
-          <option>Female Membership</option>
-          <option>Student Membership</option>
-        </select>
-      </div>
+<select id="membership">
+<option>Male Membership</option>
+<option>Female Membership</option>
+<option>Student Membership</option>
+</select>
 
-      <div class="col"><label>Join Date</label><input id="joinDate" type="date"></div>
-      <div class="col"><label>Expiry Date</label><input id="expiryDate" type="date"></div>
+<input id="joinDate" type="date">
+<input id="expiryDate" type="date">
+<input id="address" placeholder="Address">
 
-      <div class="col full"><label>Address</label><input id="address"></div>
+<div class="form-actions">
+<button type="submit" id="saveBtn">Save</button>
+<button type="button" id="resetBtn" class="ghost">Reset</button>
+</div>
+</form>
+</div>
 
-      <div class="form-actions">
-        <button type="submit" id="saveBtn">Save</button>
-        <button type="button" id="resetBtn" class="ghost">Reset</button>
-      </div>
-    </form>
-  </div>
+<!-- TABLE -->
+<div class="card">
+<input id="search" class="search" placeholder="Search member">
 
-  <!-- TABLE -->
-  <div class="card">
-    <div class="toolbar">
-      <input id="search" class="search" placeholder="Search member">
-      <select id="filterMembership">
-        <option value="">All</option>
-        <option>Male Membership</option>
-        <option>Female Membership</option>
-        <option>Student Membership</option>
-      </select>
-    </div>
+<div class="table-wrap">
+<table id="membersTable">
+<thead>
+<tr>
+<th>#</th><th>Name</th><th>Phone</th><th>Expiry</th><th>Actions</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
 
-    <div class="table-wrap">
-      <table id="membersTable">
-        <thead>
-          <tr>
-            <th>#</th><th>Name</th><th>Phone</th><th>Email</th>
-            <th>Type</th><th>Join</th><th>Expiry</th><th>Address</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <div class="footer">Tip: Export JSON to backup your data</div>
-  </div>
-
+</div>
 </div>
 
 <script>
-/* ========= AUTH ========= */
 const PASSWORD="chainfitness123";
-const loginModal=document.getElementById("loginModal");
-const loginBtn=document.getElementById("loginBtn");
+const loginBtn=loginBtnEl=document.getElementById("loginBtn");
 const logoutBtn=document.getElementById("logoutBtn");
 const protectedArea=document.getElementById("protectedArea");
+const loginModal=document.getElementById("loginModal");
 
 function checkAuth(){
-  const ok=localStorage.getItem("chain_auth")==="yes";
-  protectedArea.style.display=ok?"block":"none";
-  loginBtn.style.display=ok?"none":"inline-block";
-  logoutBtn.style.display=ok?"inline-block":"none";
+const ok=localStorage.getItem("auth")==="yes";
+protectedArea.style.display=ok?"block":"none";
+loginBtn.style.display=ok?"none":"inline";
+logoutBtn.style.display=ok?"inline":"none";
 }
 checkAuth();
 
 loginBtn.onclick=()=>loginModal.style.display="flex";
-logoutBtn.onclick=()=>{
-  localStorage.removeItem("chain_auth");
-  checkAuth();
-};
+logoutBtn.onclick=()=>{localStorage.removeItem("auth");checkAuth()};
 
 document.getElementById("authSubmit").onclick=()=>{
-  if(document.getElementById("authPass").value===PASSWORD){
-    localStorage.setItem("chain_auth","yes");
-    loginModal.style.display="none";
-    checkAuth();
-    init();
-  }else{
-    document.getElementById("authError").style.display="block";
-  }
+if(authPass.value===PASSWORD){
+localStorage.setItem("auth","yes");
+loginModal.style.display="none";
+checkAuth(); init();
+}else authError.style.display="block";
 };
 
-/* ========= MEMBERS ========= */
 function init(){
-const KEY="members_v1";
-const uid=()=>Math.random().toString(36).slice(2);
+const KEY="members";
 const load=()=>JSON.parse(localStorage.getItem(KEY)||"[]");
 const save=d=>localStorage.setItem(KEY,JSON.stringify(d));
 
 function render(){
-const tbody=document.querySelector("#membersTable tbody");
+const tbody=document.querySelector("tbody");
 tbody.innerHTML="";
 load().forEach((m,i)=>{
 tbody.innerHTML+=`
@@ -150,49 +123,48 @@ tbody.innerHTML+=`
 <td>${i+1}</td>
 <td>${m.fullName}</td>
 <td>${m.phone}</td>
-<td>${m.email}</td>
-<td>${m.membership}</td>
-<td>${m.joinDate}</td>
 <td>${m.expiryDate}</td>
-<td>${m.address}</td>
-<td class="actions-col">
-<button class="ghost" onclick="edit('${m.id}')">Edit</button>
-<button class="danger" onclick="del('${m.id}')">Delete</button>
-<button class="whatsapp" onclick="wa('${m.phone}','${m.fullName}')">WA</button>
+<td>
+<button onclick="edit('${m.id}')">Edit</button>
+<button class="danger" onclick="del('${m.id}')">Del</button>
 </td>
 </tr>`;
 });
 }
 
-document.getElementById("memberForm").onsubmit=e=>{
+memberForm.onsubmit=e=>{
 e.preventDefault();
-const id=document.getElementById("memberId").value||uid();
-const m={id,
-fullName:fullName.value,phone:phone.value,email:email.value,
-membership:membership.value,joinDate:joinDate.value,
-expiryDate:expiryDate.value,address:address.value};
+const m={
+id:memberId.value||Date.now(),
+fullName:fullName.value,
+phone:phone.value,
+email:email.value,
+membership:membership.value,
+joinDate:joinDate.value,
+expiryDate:expiryDate.value,
+address:address.value
+};
 const arr=load();
-const i=arr.findIndex(x=>x.id===id);
+const i=arr.findIndex(x=>x.id==m.id);
 i>=0?arr[i]=m:arr.push(m);
-save(arr); render(); e.target.reset();
+save(arr); e.target.reset(); render();
 };
 
 window.edit=id=>{
-const m=load().find(x=>x.id===id);
-Object.keys(m).forEach(k=>document.getElementById(k)&&(document.getElementById(k).value=m[k]));
+const m=load().find(x=>x.id==id);
+Object.keys(m).forEach(k=>window[k]&&(window[k].value=m[k]));
 };
 
 window.del=id=>{
 if(confirm("Delete member?")){
-save(load().filter(x=>x.id!==id)); render();
+save(load().filter(x=>x.id!=id)); render();
 }
 };
 
-window.wa=(p,n)=>window.open(`https://wa.me/${p}?text=${encodeURIComponent("Hi "+n+", your membership is expiring.")}`);
-
 render();
 }
-if(localStorage.getItem("chain_auth")==="yes") init();
+
+if(localStorage.getItem("auth")==="yes") init();
 </script>
 
 </body>
