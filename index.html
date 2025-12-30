@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CHAIN FITNESS — Member Records</title>
-  <!-- ✅ External CSS file -->
   <link rel="stylesheet" href="style.css">
   <style>
     button.whatsapp {
@@ -20,13 +19,97 @@
     button.whatsapp:hover {
       background-color: #1ebe57;
     }
+
+    /* ===== LOGIN OVERLAY ===== */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(7px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+    }
+
+    .login-box {
+      background: #1b1e24;
+      padding: 28px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      border: 1px solid #2a2d33;
+    }
+
+    .login-logo {
+      height: 85px;
+      width: 85px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: #2a2d33;
+      padding: 6px;
+    }
+
+    #authPass {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 10px;
+      background: #2a2e35;
+      border: 1px solid #2d323b;
+      color: #fff;
+    }
+
+    #authSubmit {
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    #authSubmit:hover {
+      background: var(--accent-hover);
+    }
+
+    #authError {
+      color: red;
+      font-size: 13px;
+      margin-top: 6px;
+      display: none;
+    }
   </style>
 </head>
 <body>
+
+  <!-- TOP BAR LOGIN -->
+  <div id="authBar" style="text-align:right;margin-bottom:10px;">
+    <button id="loginBtn">Login</button>
+    <button id="logoutBtn" style="display:none;">Logout</button>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div id="loginModal" class="login-overlay">
+    <div class="login-box">
+      <img src="./logo.jpg" alt="Chain Logo" class="login-logo" />
+      <h2>Admin Login</h2>
+      <input id="authPass" type="password" placeholder="Enter password..." />
+      <button id="authSubmit">Login</button>
+      <p id="authError">Wrong password</p>
+    </div>
+  </div>
+
   <header>
     <div class="brand">
       <div class="logo">
-	    <img src="./logo.jpg" alt="Chain Fitness Logo" style="height:80px;">
+        <img src="./logo.jpg" alt="Chain Fitness Logo" style="height:80px;">
       </div>
       <div class="company">
         <h1>CHAIN FITNESS</h1>
@@ -36,281 +119,396 @@
     <div class="tagline">Member records — stored locally in your browser</div>
   </header>
 
-  <div class="card">
-    <h2>Add / Edit Member</h2>
-    <form id="memberForm">
-      <input type="hidden" id="memberId" />
+  <!-- PROTECTED CONTENT -->
+  <div id="protectedArea" style="display:none;">
 
-      <div class="col">
-        <label for="fullName">Full name</label>
-        <input id="fullName" type="text" required placeholder="e.g. Ahmad bin Ali" />
-      </div>
+    <!-- ADD / EDIT MEMBER CARD -->
+    <div class="card">
+      <h2>Add / Edit Member</h2>
+      <form id="memberForm">
+        <input type="hidden" id="memberId" />
+        <div class="col">
+          <label for="fullName">Full name</label>
+          <input id="fullName" type="text" required placeholder="e.g. Ahmad bin Ali" />
+        </div>
+        <div class="col">
+          <label for="phone">Phone</label>
+          <input id="phone" type="text" placeholder="019xxxxxxx" />
+        </div>
+        <div class="col">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="name@example.com" />
+        </div>
+        <div class="col">
+          <label for="membership">Membership type</label>
+          <select id="membership">
+            <option value="Male Membership">Male Membership</option>
+            <option value="Female Membership">Female Membership</option>
+            <option value="Student Membership">Student Membership</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="joinDate">Join date</label>
+          <input id="joinDate" type="date" />
+        </div>
+        <div class="col">
+          <label for="expiryDate">Membership End Date</label>
+          <input id="expiryDate" type="date" />
+        </div>
+        <div class="col full">
+          <label for="address">Address</label>
+          <input id="address" type="text" placeholder="Optional" />
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="saveBtn">Save member</button>
+          <button type="button" id="resetBtn" class="ghost">Reset</button>
+        </div>
+      </form>
+    </div>
 
-      <div class="col">
-        <label for="phone">Phone</label>
-        <input id="phone" type="text" placeholder="019xxxxxxx" />
-      </div>
-
-      <div class="col">
-        <label for="email">Email</label>
-        <input id="email" type="email" placeholder="name@example.com" />
-      </div>
-
-      <div class="col">
-        <label for="membership">Membership type</label>
-        <select id="membership">
-          <option value="Male Membership">Male Membership</option>
-          <option value="Female Membership">Female Membership</option>
-          <option value="Student Membership">Student Membership</option>
+    <!-- MEMBERS TABLE CARD -->
+    <div class="card">
+      <div class="toolbar">
+        <input class="search" id="search" placeholder="Search by name, phone, email..." />
+        <select id="filterMembership">
+          <option value="">All memberships</option>
+          <option>Male Membership</option>
+          <option>Female Membership</option>
+          <option>Student Membership</option>
         </select>
+        <div class="actions">
+          <button id="exportBtn" class="ghost">Export CSV</button>
+          <button id="exportJsonBtn" class="ghost">Export JSON</button>
+          <input id="importFile" type="file" accept="application/json" style="display:none" />
+          <button id="importBtn" class="ghost">Import JSON</button>
+        </div>
       </div>
 
-      <div class="col">
-        <label for="joinDate">Join date</label>
-        <input id="joinDate" type="date" />
+      <table id="membersTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Membership</th>
+            <th>Join date</th>
+            <th>Expiry</th>
+            <th>Address</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="footer">
+        Tip: This data is stored locally in your browser's storage. To keep a backup, export JSON or CSV.
       </div>
-
-      <div class="col">
-        <label for="expiryDate">Membership End Date</label>
-        <input id="expiryDate" type="date" />
-      </div>
-
-      <div class="col full">
-        <label for="address">Address</label>
-        <input id="address" type="text" placeholder="Optional" />
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" id="saveBtn">Save member</button>
-        <button type="button" id="resetBtn" class="ghost">Reset</button>
-      </div>
-    </form>
-  </div>
-
-  <div class="card">
-    <div class="toolbar">
-      <input class="search" id="search" placeholder="Search by name, phone, email..." />
-      <select id="filterMembership">
-        <option value="">All memberships</option>
-        <option>Male Membership</option>
-        <option>Female Membership</option>
-        <option>Student Membership</option>
-      </select>
-      <div class="actions">
-        <button id="exportBtn" class="ghost">Export CSV</button>
-        <button id="exportJsonBtn" class="ghost">Export JSON</button>
-        <input id="importFile" type="file" accept="application/json" style="display:none" />
-        <button id="importBtn" class="ghost">Import JSON</button>
-      </div>
-    </div>
-
-    <table id="membersTable">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Name</th>
-          <th>Phone</th>
-          <th>Email</th>
-          <th>Membership</th>
-          <th>Join date</th>
-          <th>Expiry</th>
-          <th>Address</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <div class="footer">
-      Tip: This data is stored locally in your browser's storage. To keep a backup, export JSON or CSV.
     </div>
   </div>
 
-  <script>
-const STORAGE_KEY = 'chain_fitness_members_v2';
+<script>
+/* ==========================
+   AUTH SYSTEM
+========================== */
+const PASSWORD = "chainfitness123";
+const loginModal = document.getElementById("loginModal");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const protectedArea = document.getElementById("protectedArea");
+const authSubmit = document.getElementById("authSubmit");
+const authError = document.getElementById("authError");
 
-function uid() { return 'm_' + Math.random().toString(36).slice(2, 9); }
-function loadMembers() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-function saveMembers(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
-
-function clearForm() {
-  document.getElementById('memberId').value = '';
-  document.getElementById('memberForm').reset();
-  document.getElementById('saveBtn').textContent = 'Save member';
+function checkAuth() {
+  const logged = localStorage.getItem("chain_auth") === "yes";
+  protectedArea.style.display = logged ? "block" : "none";
+  loginBtn.style.display = logged ? "none" : "inline-block";
+  logoutBtn.style.display = logged ? "inline-block" : "none";
 }
+checkAuth();
 
-function escapeHtml(s){ 
-  return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); 
-}
+loginBtn.onclick = () => {
+  loginModal.style.display = "flex";
+  document.getElementById("authPass").value = "";
+  authError.style.display = "none";
+};
 
-function renderTable() {
-  const tbody = document.querySelector('#membersTable tbody');
-  tbody.innerHTML = '';
+authSubmit.onclick = () => {
+  const pass = document.getElementById("authPass").value;
+  if (pass === PASSWORD) {
+    localStorage.setItem("chain_auth", "yes");
+    loginModal.style.display = "none";
+    checkAuth();
+    initMemberSystem();
+  } else {
+    authError.style.display = "block";
+  }
+};
 
-  const q = document.getElementById('search').value.trim().toLowerCase();
-  const filter = document.getElementById('filterMembership').value;
-  let members = loadMembers();
+logoutBtn.onclick = () => {
+  localStorage.removeItem("chain_auth");
+  checkAuth();
+  window.scrollTo({top:0});
+};
 
-  if(filter) members = members.filter(m => m.membership === filter);
-  if(q) members = members.filter(m => (m.fullName||'').toLowerCase().includes(q));
+/* Close modal by clicking background */
+loginModal.onclick = (e) => {
+  if (e.target === loginModal) loginModal.style.display = "none";
+};
 
-  if(members.length === 0){ 
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted)">No members yet</td></tr>'; 
-    return; 
+/* ==========================
+   MEMBER RECORDS SYSTEM
+========================== */
+function initMemberSystem() {
+  const STORAGE_KEY = 'chain_fitness_members_v2';
+
+  function uid() { return 'm_' + Math.random().toString(36).slice(2, 9); }
+  function loadMembers() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  function saveMembers(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+  function clearForm() {
+    document.getElementById('memberId').value = '';
+    document.getElementById('memberForm').reset();
+    document.getElementById('saveBtn').textContent = 'Save member';
   }
 
-  const today = new Date().toISOString().slice(0,10);
+  function escapeHtml(s){ 
+    return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); 
+  }
 
-  members.forEach((m,i) => {
-    let expiryHTML = '';
-    
-    if (!m.expiryDate) {
-      expiryHTML = `<span style="color:gray">No date</span>`;
-    } else if (m.expiryDate < today) {
-      expiryHTML = `<span style="color:red;font-weight:bold">${m.expiryDate}</span>`;
-    } else {
-      const diff = Math.ceil((new Date(m.expiryDate) - new Date(today)) / (1000*60*60*24));
-      if (diff <= 7) {
-        expiryHTML = `<span style="color:orange;font-weight:bold">${m.expiryDate} (${diff} days left)</span>`;
-      } else {
-        expiryHTML = `<span style="color:green;font-weight:bold">${m.expiryDate}</span>`;
+  function renderTable() {
+    const tbody = document.querySelector('#membersTable tbody');
+    tbody.innerHTML = '';
+    const q = document.getElementById('search').value.trim().toLowerCase();
+    const filter = document.getElementById('filterMembership').value;
+    let members = loadMembers();
+    if(filter) members = members.filter(m => m.membership === filter);
+    if(q) members = members.filter(m => (m.fullName||'').toLowerCase().includes(q));
+    if(members.length === 0){ 
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted)">No members yet</td></tr>'; 
+      return; 
+    }
+    const today = new Date().toISOString().slice(0,10);
+    members.forEach((m,i) => {
+      let expiryHTML = '';
+      if (!m.expiryDate) expiryHTML = `<span style="color:gray">No date</span>`;
+      else if (m.expiryDate < today) expiryHTML = `<span style="color:red;font-weight:bold">${m.expiryDate}</span>`;
+      else {
+        const diff = Math.ceil((new Date(m.expiryDate) - new Date(today)) / (1000*60*60*24));
+        if (diff <= 7) expiryHTML = `<span style="color:orange;font-weight:bold">${m.expiryDate} (${diff} days left)</span>`;
+        else expiryHTML = `<span style="color:green;font-weight:bold">${m.expiryDate}</span>`;
       }
-    }
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td>${escapeHtml(m.fullName)}</td>
+        <td>${escapeHtml(m.phone)}</td>
+        <td>${escapeHtml(m.email)}</td>
+        <td>${escapeHtml(m.membership)}</td>
+        <td>${m.joinDate}</td>
+        <td>${expiryHTML}</td>
+        <td>${escapeHtml(m.address)}</td>
+        <td>
+          <button class='ghost' onclick='editMember("${m.id}")'>Edit</button>
+          <button class='danger' onclick='deleteMember("${m.id}")'>Delete</button>
+          <button class='whatsapp' onclick='sendWhatsApp("${m.id}")'>WhatsApp</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
 
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${i+1}</td>
-      <td>${escapeHtml(m.fullName)}</td>
-      <td>${escapeHtml(m.phone)}</td>
-      <td>${escapeHtml(m.email)}</td>
-      <td>${escapeHtml(m.membership)}</td>
-      <td>${m.joinDate}</td>
-      <td>${expiryHTML}</td>
-      <td>${escapeHtml(m.address)}</td>
-      <td>
-        <button class='ghost' onclick='editMember("${m.id}")'>Edit</button>
-        <button class='danger' onclick='deleteMember("${m.id}")'>Delete</button>
-        <button class='whatsapp' onclick='sendWhatsApp("${m.id}")'>WhatsApp</button>
-      </td>`;
-    tbody.appendChild(tr);
+  document.getElementById('memberForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const id = document.getElementById('memberId').value || uid();
+    const data = {
+      id,
+      fullName: document.getElementById('fullName').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      membership: document.getElementById('membership').value,
+      joinDate: document.getElementById('joinDate').value,
+      expiryDate: document.getElementById('expiryDate').value,
+      address: document.getElementById('address').value.trim(),
+    };
+    const members = loadMembers();
+    const idx = members.findIndex(m => m.id === id);
+    if(idx >= 0) members[idx] = data; else members.push(data);
+    saveMembers(members);
+    clearForm(); 
+    renderTable();
   });
+
+  document.getElementById('resetBtn').addEventListener('click', clearForm);
+  document.getElementById('search').addEventListener('input', renderTable);
+  document.getElementById('filterMembership').addEventListener('change', renderTable);
+
+  // Export CSV
+  document.getElementById('exportBtn').addEventListener('click', ()=>{
+    const members = loadMembers();
+    if(members.length===0) return alert('No members to export.');
+    const header = ['Name','Phone','Email','Membership','Join Date','Expiry Date','Address'];
+    const rows = members.map(m => [m.fullName, m.phone, m.email, m.membership, m.joinDate, m.expiryDate, m.address]);
+    const csv = [header, ...rows].map(r => r.map(x => `"${(x||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], {type: 'text/csv'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'members.csv';
+    link.click();
+  });
+
+  // Export JSON
+  document.getElementById('exportJsonBtn').addEventListener('click', ()=>{
+    const members = loadMembers();
+    if(members.length===0) return alert('No members to export.');
+    const blob = new Blob([JSON.stringify(members,null,2)], {type: 'application/json'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'members.json';
+    link.click();
+  });
+
+  // Import JSON
+  document.getElementById('importBtn').addEventListener('click', ()=>document.getElementById('importFile').click());
+  document.getElementById('importFile').addEventListener('change', e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      try {
+        const data = JSON.parse(ev.target.result);
+        if(!Array.isArray(data)) throw new Error('Invalid file');
+        saveMembers(data);
+        renderTable();
+        alert('Import successful!');
+      } catch {
+        alert('Import failed — invalid JSON file.');
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  // WhatsApp Reminder
+  window.sendWhatsApp = id => {
+    const m = loadMembers().find(x => x.id === id);
+    if(!m || !m.phone) return alert('No phone number available for this member.');
+    const message = `Hi ${m.fullName},\n\nYour gym membership (${m.membership}) is ${m.expiryDate ? `expiring on ${m.expiryDate}` : 'not set'}.\nPlease renew it soon.\n\n- Chain Fitness`;
+    const phone = m.phone.replace(/\D/g,'');
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url,'_blank');
+  };
+
+  // Edit/Delete
+  window.editMember = id => {
+    const m = loadMembers().find(x => x.id === id);
+    if(!m) return;
+    for(const [k,v] of Object.entries(m)) if(document.getElementById(k)) document.getElementById(k).value=v;
+    document.getElementById('saveBtn').textContent='Update member';
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+  window.deleteMember = id => {
+    if(!confirm('Delete this member?')) return;
+    saveMembers(loadMembers().filter(m=>m.id!==id));
+    renderTable();
+  };
+
+  renderTable();
 }
 
-document.getElementById('memberForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const id = document.getElementById('memberId').value || uid();
-  const data = {
-    id,
-    fullName: document.getElementById('fullName').value.trim(),
-    phone: document.getElementById('phone').value.trim(),
-    email: document.getElementById('email').value.trim(),
-    membership: document.getElementById('membership').value,
-    joinDate: document.getElementById('joinDate').value,
-    expiryDate: document.getElementById('expiryDate').value,
-    address: document.getElementById('address').value.trim(),
-  };
+// Initialize if already logged in
+if(localStorage.getItem("chain_auth")==="yes"){
+  initMemberSystem();
+}
 
-  const members = loadMembers();
-  const idx = members.findIndex(m => m.id === id);
-  if(idx >= 0) members[idx] = data; else members.push(data);
+/* ===== AUTO-LOGOUT TIMER ===== */
+let logoutTimer, countdownInterval;
 
-  saveMembers(members);
-  clearForm(); 
-  renderTable();
-});
+function startLogoutTimer() {
+  clearTimeout(logoutTimer);
+  logoutTimer = setTimeout(showLogoutWarning, 9*60*1000); // 9 minutes
+}
 
-document.getElementById('resetBtn').addEventListener('click', clearForm);
+function showLogoutWarning() {
+  let overlay = document.createElement("div");
+  overlay.id = "logoutWarning";
+  overlay.innerHTML = `
+    <div style="
+      background: var(--card);
+      padding: 28px;
+      border-radius: 16px;
+      text-align: center;
+      border: 1px solid #2a2d33;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      max-width: 320px;
+      width: 90%;
+      opacity: 0;
+      transform: translateY(-30px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    ">
+      <img src="./logo.jpg" style="height:70px;width:70px;margin-bottom:12px;border-radius:12px;object-fit:contain;background:#2a2d33;padding:6px;" />
+      <h2 style="color: var(--accent);margin-bottom:12px;">Auto-logout in <span id="logoutCountdown">60</span>s</h2>
+      <p style="color: var(--text);font-size:14px;margin-bottom:16px;">Click below to stay logged in</p>
+      <button id="stayLoggedInBtn" style="
+        padding: 10px 16px;
+        border:none;
+        border-radius: 10px;
+        background: var(--accent);
+        color: #000;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+      ">Stay Logged In</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
 
-window.editMember = id => {
-  const m = loadMembers().find(x => x.id === id);
-  if(!m) return;
-  for(const [k,v] of Object.entries(m)) {
-    if(document.getElementById(k)) document.getElementById(k).value = v;
-  }
-  document.getElementById('saveBtn').textContent = 'Update member';
-  window.scrollTo({top:0,behavior:'smooth'});
-};
+  setTimeout(() => overlay.classList.add("show"), 10);
 
-window.deleteMember = id => {
-  if(!confirm('Delete this member?')) return;
-  saveMembers(loadMembers().filter(m => m.id !== id)); 
-  renderTable();
-};
+  const countdownEl = document.getElementById("logoutCountdown");
+  let seconds = 60;
 
-document.getElementById('search').addEventListener('input', renderTable);
-document.getElementById('filterMembership').addEventListener('change', renderTable);
-
-// Export CSV
-document.getElementById('exportBtn').addEventListener('click', ()=>{
-  const members = loadMembers();
-  if(members.length===0) return alert('No members to export.');
-
-  const header = ['Name','Phone','Email','Membership','Join Date','Expiry Date','Address'];
-  const rows = members.map(m => [
-    m.fullName, m.phone, m.email, m.membership, m.joinDate, m.expiryDate, m.address
-  ]);
-
-  const csv = [header, ...rows]
-    .map(r => r.map(x => `"${(x||'').replace(/"/g,'""')}"`).join(','))
-    .join('\n');
-
-  const blob = new Blob([csv], {type: 'text/csv'});
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'members.csv';
-  link.click();
-});
-
-// Export JSON
-document.getElementById('exportJsonBtn').addEventListener('click', ()=>{
-  const members = loadMembers();
-  if(members.length===0) return alert('No members to export.');
-
-  const blob = new Blob([JSON.stringify(members,null,2)], {type: 'application/json'});
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'members.json';
-  link.click();
-});
-
-// Import JSON
-document.getElementById('importBtn').addEventListener('click', ()=>{
-  document.getElementById('importFile').click();
-});
-
-document.getElementById('importFile').addEventListener('change', e=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev=>{
-    try {
-      const data = JSON.parse(ev.target.result);
-      if(!Array.isArray(data)) throw new Error('Invalid file');
-      saveMembers(data);
-      renderTable();
-      alert('Import successful!');
-    } catch {
-      alert('Import failed — invalid JSON file.');
+  countdownInterval = setInterval(() => {
+    seconds--;
+    countdownEl.textContent = seconds;
+    if (seconds <= 0) {
+      clearInterval(countdownInterval);
+      overlay.classList.remove("show");
+      setTimeout(() => document.body.removeChild(overlay), 300);
+      localStorage.removeItem("chain_auth");
+      checkAuth();
+      alert("You have been logged out due to inactivity.");
     }
+  }, 1000);
+
+  document.getElementById("stayLoggedInBtn").onclick = () => {
+    clearInterval(countdownInterval);
+    overlay.classList.remove("show");
+    setTimeout(() => document.body.removeChild(overlay), 300);
+    startLogoutTimer(); // reset main timer
   };
-  reader.readAsText(file);
-});
+}
 
-// WhatsApp Reminder Function
-window.sendWhatsApp = id => {
-  const m = loadMembers().find(x => x.id === id);
-  if(!m || !m.phone) return alert('No phone number available for this member.');
-
-  const message = `Hi ${m.fullName},\n\nYour gym membership (${
-    m.membership
-  }) is ${m.expiryDate ? `expiring on ${m.expiryDate}` : 'not set'}.\nPlease renew it soon.\n\n- Chain Fitness`;
-
-  const phone = m.phone.replace(/\D/g,''); // only digits
-  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
+// Start timer after login
+if (localStorage.getItem("chain_auth") === "yes") startLogoutTimer();
+loginBtn.onclick = () => loginModal.style.display = "flex";
+authSubmit.onclick = () => {
+  const pass = document.getElementById("authPass").value;
+  if (pass === PASSWORD) {
+    localStorage.setItem("chain_auth", "yes");
+    loginModal.style.display = "none";
+    checkAuth();
+    startLogoutTimer(); // start timer after login
+  } else {
+    document.getElementById("authError").style.display = "block";
+  }
+};
+logoutBtn.onclick = () => {
+  localStorage.removeItem("chain_auth");
+  checkAuth();
+  clearTimeout(logoutTimer);
+  window.scrollTo({top:0});
 };
 
-renderTable();
 </script>
+
 </body>
 </html>
