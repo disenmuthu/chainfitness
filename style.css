@@ -359,3 +359,48 @@ button.whatsapp:hover {
     transform: translateY(0);
   }
 }
+
+/* === MOBILE FIX === */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Wrap table */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Table responsive */
+table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+}
+
+/* Buttons stack on mobile */
+@media (max-width: 768px) {
+  .actions,
+  .controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  input,
+  select {
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+}
