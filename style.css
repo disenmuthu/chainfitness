@@ -1,4 +1,4 @@
-/* ===== CHAIN FITNESS Dark Edition v2.0 ===== */
+/* ===== CHAIN FITNESS Dark Edition v2.1 (Mobile-Optimized) ===== */
 :root {
   --bg: #0e0f13;
   --card: #1b1e24;
@@ -163,6 +163,37 @@ button.danger:hover {
   background: #ef4444;
 }
 
+/* WhatsApp button */
+button.whatsapp {
+  background-color: #25D366;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 4px;
+  transition: 0.2s;
+}
+
+button.whatsapp:hover {
+  background-color: #1ebe57;
+}
+
+/* Logout button */
+#logoutBtn {
+  background: var(--danger);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+#logoutBtn:hover {
+  background: #ef4444;
+}
+
 /* ===== Toolbar ===== */
 .toolbar {
   display: flex;
@@ -188,10 +219,13 @@ button.danger:hover {
 }
 
 /* ===== Table ===== */
+.table-wrapper {
+  overflow-x: auto;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 12px;
 }
 
 th, td {
@@ -199,6 +233,7 @@ th, td {
   text-align: left;
   border-bottom: 1px solid #2d323b;
   font-size: 14px;
+  white-space: nowrap; /* prevent weird wrapping on mobile */
 }
 
 th {
@@ -221,28 +256,7 @@ tr:hover {
   text-align: center;
 }
 
-/* ===== Responsiveness ===== */
-@media (max-width: 600px) {
-  body {
-    padding: 16px;
-  }
-
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  button, .search, select {
-    width: 100%;
-  }
-}
-
-/* ===== LOGIN OVERLAY ===== */
+/* ===== Login Overlay ===== */
 .login-overlay {
   position: fixed;
   inset: 0;
@@ -308,36 +322,7 @@ tr:hover {
   display: none;
 }
 
-/* ===== WhatsApp Button ===== */
-button.whatsapp {
-  background-color: #25D366;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-left: 4px;
-  transition: 0.2s;
-}
-button.whatsapp:hover {
-  background-color: #1ebe57;
-}
-
-/* ===== Logout Button ===== */
-#logoutBtn {
-  background: var(--danger);
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-}
-#logoutBtn:hover {
-  background: #ef4444;
-}
-
-/* ===== AUTO-LOGOUT WARNING ANIMATION ===== */
+/* ===== Logout Warning ===== */
 #logoutWarning {
   opacity: 0;
   transform: translateY(-30px);
@@ -349,58 +334,38 @@ button.whatsapp:hover {
   transform: translateY(0);
 }
 
-/* ===== AUTO-LOGOUT WARNING RESPONSIVE ===== */
-@media (max-width: 768px) {
-  #logoutWarning div {
-    transform: translateY(100px);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-  }
-  #logoutWarning.show div {
-    transform: translateY(0);
-  }
+#logoutWarning div {
+  max-width: 320px;
+  width: 90%;
+  margin: auto;
 }
 
-/* Make the main container flexible */
-.container {
-  max-width: 100%;
-  width: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-/* Make table responsive */
-.table-wrapper {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%; /* stretch table to fit screen */
-  border-collapse: collapse;
-}
-
-/* Make buttons stretch on mobile */
-button {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-/* ===== Mobile adjustments ===== */
+/* ===== Responsive Adjustments ===== */
 @media (max-width: 600px) {
   body {
     font-size: 14px;
+    padding: 16px;
   }
-  
-  table th, table td {
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  button,
+  .search,
+  select {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  th, td {
     padding: 5px;
     font-size: 12px;
-  }
-
-  .container {
-    padding: 5px;
-  }
-
-  button {
-    font-size: 14px;
-    padding: 8px;
   }
 }
